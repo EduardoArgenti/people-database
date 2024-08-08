@@ -1,11 +1,13 @@
 from datetime import date, datetime
 from typing import List
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import delete
 from pydantic import BaseModel
 import models, database
+from io import BytesIO
+import pandas as pd
 
 app = FastAPI()
 
@@ -49,6 +51,7 @@ def get_db():
 def read_root():
     return {"A simple FastAPI crud using React and Postgres"}
 
+# Person CRUD
 @app.post("/people/", response_model=PersonModel)
 async def create_person(person: PersonBase, db: Session = Depends(get_db)):
     db_person = models.Person(**person.dict())
@@ -78,3 +81,14 @@ async def remove_person(id: int, db: Session = Depends(get_db)):
         db.commit()
         return f'Person ID {id} successfully deleted'
     raise HTTPException(status_code=404, detail=f'Person ID {id} not found')
+
+# CSV upload
+
+@app.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+    content = await file.read()
+    buffer = BytesIO(content)
+    df = pd.read_csv(buffer)
+    buffer.close()
+    file.close()
+    return df.to_dict(orient='records')
