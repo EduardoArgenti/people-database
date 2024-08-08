@@ -44,58 +44,73 @@ const App = () => {
             <nav className='navbar navbar-dark bg-primary'>
                 <div className='container-fluid'>
                     <a className='navbar-brand' href='#'>
-                        People Database
+                        Base de dados
                     </a>
                 </div>
             </nav>
 
             <div className='container'>
+                <h3>Formulário</h3>
                 <form onSubmit={handleFormSubmit}>
 
                     <div className="mb-3 mt-3">
                         <label htmlFor='name' className='form-label'>
-                            Name
+                            Nome
                         </label>
                         <input type='text' className='form-control' id='name' name='name' onChange={handleInputChange} value={formData.name}/>
                     </div>
 
                     <div className='mb-3'>
                         <label htmlFor='birthdate' className='form-label'>
-                            Birthdate
+                            Data de nascimento
                         </label>
                         <input type='text' className='form-control' id='birthdate' name='birthdate' onChange={handleInputChange} value={formData.birthdate}/>
                     </div>
 
                     <div className='mb-3'>
                         <label htmlFor='gender' className='form-label'>
-                            Gender
+                            Gênero
                         </label>
                         <input type='text' className='form-control' id='gender' name='gender' onChange={handleInputChange} value={formData.gender}/>
                     </div>
 
                     <div className='mb-3'>
                         <label htmlFor='nationality' className='form-label'>
-                            Nationality
+                            Nacionalidade
                         </label>
                         <input type='text' className='form-control' id='nationality' name='nationality' onChange={handleInputChange} value={formData.nationality}/>
                     </div>
 
                     <button type='submit' className='btn btn-primary'>
-                        Submit
+                        Salvar
                     </button>
 
                 </form>
+            </div>
 
+            <div className='container'>
+                <h3>Upload de CSV</h3>
+                <form onSubmit={handleFormSubmit}>
+
+                    <button type='submit' className='btn btn-primary'>
+                        Carregar
+                    </button>
+
+                </form>
+            </div>
+
+            <div className='container'>
+                <h3>Dados</h3>
                 <table className='table  table-bordered table-striped table-hover'>
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Name</th>
-                            <th>Birthdate</th>
-                            <th>Gender</th>
-                            <th>Nationality</th>
-                            <th>Created at</th>
-                            <th>Updated at</th>
+                            <th>Nome</th>
+                            <th>Data de nascimento</th>
+                            <th>Gênero</th>
+                            <th>Nacionalidade</th>
+                            <th>Criado em</th>
+                            <th>Atualizado em</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -112,7 +127,6 @@ const App = () => {
                         ))}
                     </tbody>
                 </table>
-
             </div>
 
         </div>
