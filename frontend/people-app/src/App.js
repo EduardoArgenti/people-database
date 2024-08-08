@@ -111,18 +111,30 @@ const App = () => {
                             <th>Nacionalidade</th>
                             <th>Criado em</th>
                             <th>Atualizado em</th>
+                            <th>Editar</th>
+                            <th>Remover</th>
                         </tr>
                     </thead>
                     <tbody>
                         {people.map((person) => (
-                            <tr key={person.id}>
-                                <td>{person.id}</td>
-                                <td>{person.name}</td>
-                                <td>{person.birthdate}</td>
-                                <td>{person.gender}</td>
-                                <td>{person.nationality}</td>
-                                <td>{person.created_at}</td>
-                                <td>{person.updated_at}</td>
+                            <tr key={person.id} style={{ verticalAlign: "middle"}}>
+                                <td className="align-middle-custom">{person.id}</td>
+                                <td className="align-middle-custom">{person.name}</td>
+                                <td className="align-middle-custom">{person.birthdate}</td>
+                                <td className="align-middle-custom">{person.gender}</td>
+                                <td className="align-middle-custom">{person.nationality}</td>
+                                <td className="align-middle-custom">{person.created_at}</td>
+                                <td className="align-middle-custom">{person.updated_at}</td>
+                                <td className="text-center align-middle-custom">
+                                    <button className="alert alert-info" style={{ marginBottom: '0px', padding: '5px 12px' }}>
+                                        <i className="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                                <td className="text-center align-middle-custom">
+                                    <button className="alert alert-danger" style={{ marginBottom: '0px', padding: '5px 12px' }}>
+                                        <i className="fas fa-trash-can"></i>
+                                    </button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>

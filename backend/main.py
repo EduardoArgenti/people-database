@@ -3,7 +3,7 @@ from typing import List
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import delete
 from pydantic import BaseModel
 import models, database
 
@@ -67,4 +67,14 @@ async def fetch_person(id: int, db: Session = Depends(get_db)):
     person = db.query(models.Person).filter(models.Person.id == id).first()
     if person:
         return person
+    raise HTTPException(status_code=404, detail=f'Person ID {id} not found')
+
+@app.delete("/people/{id}", response_model=str)
+async def remove_person(id: int, db: Session = Depends(get_db)):
+    person = await fetch_person(id, db)
+
+    if person:
+        db.delete(person)
+        db.commit()
+        return f'Person ID {id} successfully deleted'
     raise HTTPException(status_code=404, detail=f'Person ID {id} not found')
