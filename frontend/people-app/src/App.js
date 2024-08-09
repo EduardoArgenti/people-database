@@ -1,30 +1,39 @@
-import React, {useState, useEffect} from 'react'
-import api from './api'
+import React, { useState, useEffect } from 'react';
+import api from './api';
 
 const App = () => {
     const [people, setPeople] = useState([]);
     const [formData, setFormData] = useState({
+        id: '',
         name: '',
         birthdate: '',
         gender: '',
         nationality: ''
     });
     const [file, setFile] = useState([]);
+    const [editId, setEditId] = useState(null);
 
     // Get records
     const fetchPeople = async () => {
         const response = await api.get('/people/');
-        setPeople(response.data)
+        setPeople(response.data);
     };
 
     useEffect(() => {
         fetchPeople();
     }, []);
 
-    // Add records
+    // Add or update records
     const handleFormSubmit = async (event) => {
         event.preventDefault();
-        await api.post('/people/', formData);
+        if (editId) {
+            // Update record
+            await api.put(`/people/${editId}`, formData);
+            setEditId(null);
+        } else {
+            // Create new record
+            await api.post('/people/', formData);
+        }
         fetchPeople();
         setFormData({
             name: '',
@@ -60,8 +69,6 @@ const App = () => {
         });
     };
 
-    // Update record
-
     // Delete record
     const deletePerson = async (id) => {
         await api.delete(`/people/${id}`);
@@ -73,6 +80,18 @@ const App = () => {
             nationality: ''
         });
     }
+
+    // Edit record
+    const handleEdit = (person) => {
+        setFormData({
+            id: person.id,
+            name: person.name,
+            birthdate: person.birthdate,
+            gender: person.gender,
+            nationality: person.nationality
+        });
+        setEditId(person.id);
+    };
 
     return (
         <div>
@@ -92,32 +111,32 @@ const App = () => {
                         <label htmlFor='name' className='form-label'>
                             Nome
                         </label>
-                        <input type='text' className='form-control' id='name' name='name' onChange={handleInputChange} value={formData.name}/>
+                        <input type='text' className='form-control' id='name' name='name' onChange={handleInputChange} value={formData.name} />
                     </div>
 
                     <div className='mb-3'>
                         <label htmlFor='birthdate' className='form-label'>
                             Data de nascimento
                         </label>
-                        <input type='text' className='form-control' id='birthdate' name='birthdate' onChange={handleInputChange} value={formData.birthdate}/>
+                        <input type='text' className='form-control' id='birthdate' name='birthdate' onChange={handleInputChange} value={formData.birthdate} />
                     </div>
 
                     <div className='mb-3'>
                         <label htmlFor='gender' className='form-label'>
                             Gênero
                         </label>
-                        <input type='text' className='form-control' id='gender' name='gender' onChange={handleInputChange} value={formData.gender}/>
+                        <input type='text' className='form-control' id='gender' name='gender' onChange={handleInputChange} value={formData.gender} />
                     </div>
 
                     <div className='mb-3'>
                         <label htmlFor='nationality' className='form-label'>
                             Nacionalidade
                         </label>
-                        <input type='text' className='form-control' id='nationality' name='nationality' onChange={handleInputChange} value={formData.nationality}/>
+                        <input type='text' className='form-control' id='nationality' name='nationality' onChange={handleInputChange} value={formData.nationality} />
                     </div>
 
                     <button type='submit' className='btn btn-primary'>
-                        Salvar
+                        {editId ? 'Atualizar' : 'Salvar'}
                     </button>
 
                 </form>
@@ -151,7 +170,7 @@ const App = () => {
                     </thead>
                     <tbody>
                         {people.map((person) => (
-                            <tr key={person.id} style={{ verticalAlign: "middle"}}>
+                            <tr key={person.id} style={{ verticalAlign: "middle" }}>
                                 <td className="align-middle-custom">{person.id}</td>
                                 <td className="align-middle-custom">{person.name}</td>
                                 <td className="align-middle-custom">{person.birthdate}</td>
@@ -160,7 +179,8 @@ const App = () => {
                                 <td className="align-middle-custom">{person.created_at}</td>
                                 <td className="align-middle-custom">{person.updated_at}</td>
                                 <td className="text-center align-middle-custom">
-                                    <button className="alert alert-info" style={{ marginBottom: '0px', padding: '5px 12px' }}>
+                                    <button
+                                        onClick={() => handleEdit(person)} className="alert alert-info" style={{ marginBottom: '0px', padding: '5px 12px' }}>
                                         <i className="fas fa-edit"></i>
                                     </button>
                                 </td>

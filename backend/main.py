@@ -1,12 +1,9 @@
-from datetime import date, datetime
+from datetime import datetime
 from typing import List
 from fastapi import FastAPI, Depends, HTTPException, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from sqlalchemy import delete
-from pydantic import BaseModel
 import models, database, schemas
-from io import BytesIO
 import pandas as pd
 
 app = FastAPI()
@@ -61,8 +58,17 @@ async def fetch_person(id: int, db: Session = Depends(get_db)):
 async def update_person(id: int, new_data: schemas.PersonUpdate, db: Session = Depends(get_db)):
     person = await fetch_person(id, db)
     if person:
+
+        update_data = new_data.dict(exclude_unset=True)
+
+        # Some data remain unchanged
+        update_data.pop("id", None)
+        update_data.pop("created_at", None)
+
         for key, value in new_data.dict().items():
             setattr(person, key, value)
+
+        person.updated_at = datetime.now()
 
         db.commit()
         db.refresh(person)
