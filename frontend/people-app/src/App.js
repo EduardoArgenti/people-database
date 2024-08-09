@@ -37,7 +37,7 @@ const App = () => {
 
     useEffect(() => {
         fetchLogs();
-    });
+    }, []);
 
 
     const handleFilterColumnChange = (event) => {
@@ -82,6 +82,7 @@ const App = () => {
             gender: '',
             nationality: ''
         });
+        fetchLogs();
     };
 
     const handleInputChange = (event) => {
