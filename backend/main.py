@@ -122,7 +122,7 @@ async def fetch_person(id: int, db: Session = Depends(get_db)):
 async def update_person(id: int, new_data: schemas.PersonUpdate, db: Session = Depends(get_db)):
     person = await fetch_person(id, db)
     if person:
-
+        old_data = parse_data(person)
         update_data = new_data.dict(exclude_unset=True)
         update_data.pop("id", None)
         update_data.pop("created_at", None)
@@ -134,6 +134,7 @@ async def update_person(id: int, new_data: schemas.PersonUpdate, db: Session = D
 
         db.commit()
         db.refresh(person)
+        log_operation(person_id=id, operation_type='update', old_data=old_data, new_data=update_data, db=db)
 
         return person
 
