@@ -1,2 +1,3 @@
-# Desafio App de Banco de Dados - FastAPI, Postgres e React
+# Desafio App de Banco de Dados
+## Utilizando FastAPI, PostgreSQL e React
 
