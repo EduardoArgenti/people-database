@@ -73,3 +73,13 @@ npm start
 
 ## Documentação
 O backend possui um swagger que pode ser acessado em http://localhost:8000/docs
+
+O backend foi organizado de acordo com boas práticas de arquitetura limpa, com separação de responsabilidade.
+
+* backend
+    * models: define os modelos do banco de dados compatíveis com o SQLAlchemy
+    * routers: gerencia as requisições HTTP e direciona para os controladores apropriados em /services
+    * schemas: contém modelos do Pydantic que padronizam a entrada e saída de dados na API
+    * services: contém as regras de negócio da aplicação
+
+Como os dados do .csv parecem ser bem estruturados, um banco relacional é uma ótima escolha. O PostgreSQL foi escolhido devido à sua crescente popularidade na comunidade dev.
