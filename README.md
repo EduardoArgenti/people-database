@@ -83,3 +83,6 @@ O backend foi organizado de acordo com boas práticas de arquitetura limpa, com 
     * services: contém as regras de negócio da aplicação
 
 Como os dados do .csv parecem ser bem estruturados, um banco relacional é uma ótima escolha. O PostgreSQL foi escolhido devido à sua crescente popularidade na comunidade dev.
+
+## Demonstração
+[Vídeo de demonstração](https://www.youtube.com/watch?v=LLueMRGUgms)

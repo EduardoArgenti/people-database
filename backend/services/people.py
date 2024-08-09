@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from models.person import Person
 from schemas.person import PersonBase, PersonModel, PersonUpdate
 from services.logs import log_operation, parse_data
-from typing import Optional, List
+from typing import Optional
 import core.database as database
 from fastapi import Depends, HTTPException
 from sqlalchemy import or_

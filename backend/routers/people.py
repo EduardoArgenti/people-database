@@ -1,11 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from models.person import Person
 from schemas.person import PersonBase, PersonModel, PersonUpdate
 import core.database as database
 from typing import List, Optional
 from services.people import add_person, get_people, get_person, put_person, delete_person
-from services.logs import log_operation, parse_data
 
 router = APIRouter()
 
