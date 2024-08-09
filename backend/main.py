@@ -1,11 +1,5 @@
-from typing import List
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
-from sqlalchemy.orm import Session
-from sqlalchemy import or_
-import models, database, schemas
-import io
 from routers import people, csv, logs
 
 app = FastAPI()

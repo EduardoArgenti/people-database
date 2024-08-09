@@ -1,10 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, HTTPException, File, UploadFile
 from sqlalchemy.orm import Session
-import models, schemas, database
-from typing import List, Optional
-from datetime import datetime, date
+from models.person import Person
+from schemas.person import PersonCreateCsv
+import core.database as database
+from typing import List
 import pandas as pd
 from services.people import add_person
+from fastapi.responses import StreamingResponse
+import io
 
 router = APIRouter()
 
@@ -37,7 +40,7 @@ async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db
             "updated_at": row['data_atualizacao']
         }
 
-        person_base = schemas.PersonCreateCsv(**person_data)
+        person_base = PersonCreateCsv(**person_data)
         created_person = await add_person(person_base, db)
         created_people.append(created_person)
 
@@ -45,7 +48,7 @@ async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db
 
 @router.post("/people/download", tags=['CSV'])
 async def download_file(ids: List[int], db: Session = Depends(get_db)):
-    people = db.query(models.Person).filter(models.Person.id.in_(ids)).all()
+    people = db.query(Person).filter(Person.id.in_(ids)).all()
 
     if people:
         df = pd.DataFrame([person.__dict__ for person in people])
