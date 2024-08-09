@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from fastapi import FastAPI, Depends, HTTPException, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -43,8 +43,23 @@ async def create_person(person: schemas.PersonBase, db: Session = Depends(get_db
     return db_person
 
 @app.get("/people/", response_model=List[schemas.PersonModel])
-async def fetch_people(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
-    people = db.query(models.Person).offset(skip).limit(limit).all()
+async def fetch_people(
+    db: Session = Depends(get_db),
+    skip: int = 0,
+    limit: int = 100,
+    filter_column: Optional[str] = None,
+    filter_value: Optional[str] = None
+):
+    query = db.query(models.Person)
+
+    if filter_column and filter_value:
+        if filter_column == 'id':
+            filter_value_int = int(filter_value)
+            query = query.filter(models.Person.id == filter_value_int)
+        elif filter_column in ['name', 'gender', 'nationality']:
+            query = query.filter(getattr(models.Person, filter_column).ilike(f"%{filter_value}%"))
+
+    people = query.offset(skip).limit(limit).all()
     return people
 
 @app.get("/people/{id}", response_model=schemas.PersonModel)

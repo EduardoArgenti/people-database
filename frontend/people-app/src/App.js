@@ -12,16 +12,31 @@ const App = () => {
     });
     const [file, setFile] = useState([]);
     const [editId, setEditId] = useState(null);
+    const [filterColumn, setFilterColumn] = useState('');
+    const [filterValue, setFilterValue] = useState('');
 
     // Get records
     const fetchPeople = async () => {
-        const response = await api.get('/people/');
+        const response = await api.get('/people/', {
+            params: {
+                filter_column: filterColumn,
+                filter_value: filterValue
+            }
+        });
         setPeople(response.data);
     };
 
     useEffect(() => {
         fetchPeople();
-    }, []);
+    }, [filterColumn, filterValue]);
+
+    const handleFilterColumnChange = (event) => {
+        setFilterColumn(event.target.value);
+    };
+
+    const handleFilterValueChange = (event) => {
+        setFilterValue(event.target.value);
+    };
 
     // Add or update records
     const handleFormSubmit = async (event) => {
@@ -149,6 +164,42 @@ const App = () => {
                     <button type='submit' className='btn btn-primary'>
                         Carregar
                     </button>
+                </form>
+            </div>
+
+            <div className='container'>
+                <h3>Filtro</h3>
+                <form>
+                    <div className='mb-3'>
+                        <label htmlFor='filterColumn' className='form-label'>
+                            Coluna
+                        </label>
+                        <select
+                            id='filterColumn'
+                            className='form-select'
+                            value={filterColumn}
+                            onChange={handleFilterColumnChange}
+                        >
+                            <option value=''>Escolha uma coluna</option>
+                            <option value='id'>ID</option>
+                            <option value='name'>Nome</option>
+                            <option value='gender'>Gênero</option>
+                            <option value='nationality'>Nacionalidade</option>
+                            <option value='keyword'>Palavra-chave</option>
+                        </select>
+                    </div>
+                    <div className='mb-3'>
+                        <label htmlFor='filterValue' className='form-label'>
+                            Valor
+                        </label>
+                        <input
+                            type='text'
+                            id='filterValue'
+                            className='form-control'
+                            value={filterValue}
+                            onChange={handleFilterValueChange}
+                        />
+                    </div>
                 </form>
             </div>
 
