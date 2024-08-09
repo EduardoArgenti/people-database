@@ -51,5 +51,25 @@ CREATE TABLE logs (
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
+Inicie o servidor:
+```
+uvicorn main:app --reload
+```
 
 ### Frontend
+Navegue até o diretório do frontend:
+```
+cd people-database/frontend
+```
+Instale as dependências:
+```
+npm install
+```
+Entre na pasta da aplicação e inicie o servidor de desenvolvimento:
+```
+cd people-app
+npm start
+```
+
+## Documentação
+O backend possui um swagger que pode ser acessado em http://localhost:8000/docs
