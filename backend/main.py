@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from typing import List, Optional
 from fastapi import FastAPI, Depends, HTTPException, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,6 +32,41 @@ def get_db():
         db.close()
 
 
+def serialize_dates(data):
+    if isinstance(data, dict):
+        return {k: serialize_dates(v) for k, v in data.items()}
+    if isinstance(data, list):
+        return [serialize_dates(i) for i in data]
+    if isinstance(data, (datetime, date)):
+        return data.isoformat()
+    return data
+
+
+def log_operation(person_id: int, operation_type: str, old_data=None, new_data=None, db: Session = Depends(get_db)):
+    log_entry = models.Log(
+        person_id=person_id,
+        operation_type=operation_type,
+        old_data=serialize_dates(old_data),
+        new_data=serialize_dates(new_data)
+    )
+    db.add(log_entry)
+    db.commit()
+
+
+def parse_data(person):
+    parsed_data = {
+        "id": person.id,
+        "name": person.name,
+        "birthdate": person.birthdate,
+        "gender": person.gender,
+        "nationality": person.nationality,
+        "created_at": person.created_at,
+        "updated_at": person.updated_at
+    }
+
+    return parsed_data
+
+
 @app.get("/")
 def read_root():
     return {"A simple FastAPI crud using React and PostgreSQL"}
@@ -43,6 +78,7 @@ async def create_person(person: schemas.PersonBase, db: Session = Depends(get_db
     db.add(db_person)
     db.commit()
     db.refresh(db_person)
+    log_operation(db_person.id, 'create', new_data=person.dict(), db=db)
     return db_person
 
 @app.get("/people/", response_model=List[schemas.PersonModel])
@@ -88,8 +124,6 @@ async def update_person(id: int, new_data: schemas.PersonUpdate, db: Session = D
     if person:
 
         update_data = new_data.dict(exclude_unset=True)
-
-        # Some data remain unchanged
         update_data.pop("id", None)
         update_data.pop("created_at", None)
 
@@ -108,8 +142,10 @@ async def remove_person(id: int, db: Session = Depends(get_db)):
     person = await fetch_person(id, db)
 
     if person:
+        old_data = parse_data(person)
         db.delete(person)
         db.commit()
+        log_operation(person_id=id, operation_type='delete', old_data=old_data, db=db)
         return f'Person ID {id} successfully deleted'
 
 # CSV
