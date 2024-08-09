@@ -11,6 +11,7 @@ const App = () => {
     });
     const [file, setFile] = useState([]);
 
+    // Get records
     const fetchPeople = async () => {
         const response = await api.get('/people/');
         setPeople(response.data)
@@ -20,14 +21,7 @@ const App = () => {
         fetchPeople();
     }, []);
 
-    const handleInputChange = (event) => {
-        const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
-        setFormData({
-            ...formData,
-            [event.target.name]: value
-        });
-    };
-
+    // Add records
     const handleFormSubmit = async (event) => {
         event.preventDefault();
         await api.post('/people/', formData);
@@ -37,6 +31,14 @@ const App = () => {
             birthdate: '',
             gender: '',
             nationality: ''
+        });
+    };
+
+    const handleInputChange = (event) => {
+        const value = event.target.value;
+        setFormData({
+            ...formData,
+            [event.target.name]: value
         });
     };
 
@@ -57,6 +59,20 @@ const App = () => {
             nationality: ''
         });
     };
+
+    // Update record
+
+    // Delete record
+    const deletePerson = async (id) => {
+        await api.delete(`/people/${id}`);
+        fetchPeople();
+        setFormData({
+            name: '',
+            birthdate: '',
+            gender: '',
+            nationality: ''
+        });
+    }
 
     return (
         <div>
@@ -114,7 +130,6 @@ const App = () => {
                     <button type='submit' className='btn btn-primary'>
                         Carregar
                     </button>
-
                 </form>
             </div>
 
@@ -150,7 +165,8 @@ const App = () => {
                                     </button>
                                 </td>
                                 <td className="text-center align-middle-custom">
-                                    <button className="alert alert-danger" style={{ marginBottom: '0px', padding: '5px 12px' }}>
+                                    <button
+                                        onClick={() => deletePerson(person.id)} className="alert alert-danger" style={{ marginBottom: '0px', padding: '5px 12px' }}>
                                         <i className="fas fa-trash-can"></i>
                                     </button>
                                 </td>

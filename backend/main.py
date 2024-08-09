@@ -57,6 +57,18 @@ async def fetch_person(id: int, db: Session = Depends(get_db)):
         return person
     raise HTTPException(status_code=404, detail=f'Person ID {id} not found')
 
+@app.put("/people/{id}", response_model=schemas.PersonModel)
+async def update_person(id: int, new_data: schemas.PersonUpdate, db: Session = Depends(get_db)):
+    person = await fetch_person(id, db)
+    if person:
+        for key, value in new_data.dict().items():
+            setattr(person, key, value)
+
+        db.commit()
+        db.refresh(person)
+
+        return person
+
 @app.delete("/people/{id}", response_model=str)
 async def remove_person(id: int, db: Session = Depends(get_db)):
     person = await fetch_person(id, db)
@@ -65,7 +77,6 @@ async def remove_person(id: int, db: Session = Depends(get_db)):
         db.delete(person)
         db.commit()
         return f'Person ID {id} successfully deleted'
-    raise HTTPException(status_code=404, detail=f'Person ID {id} not found')
 
 # CSV
 @app.post("/people/upload")

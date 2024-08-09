@@ -11,6 +11,9 @@ class PersonCreateCsv(PersonBase):
     created_at: datetime
     updated_at: datetime
 
+class PersonUpdate(PersonCreateCsv):
+    pass
+
 class PersonModel(PersonBase):
     id: int
     created_at: datetime
