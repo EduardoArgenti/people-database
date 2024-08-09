@@ -109,6 +109,7 @@ const App = () => {
             gender: '',
             nationality: ''
         });
+        fetchLogs();
     };
 
     // Delete record
@@ -121,6 +122,7 @@ const App = () => {
             gender: '',
             nationality: ''
         });
+        fetchLogs();
     }
 
     // Edit record
