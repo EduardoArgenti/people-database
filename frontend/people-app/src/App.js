@@ -15,6 +15,7 @@ const App = () => {
     const [filterColumn, setFilterColumn] = useState('');
     const [filterValue, setFilterValue] = useState('');
     const [keyword, setKeyword] = useState('');
+    const [filteredIds, setFilteredIds] = useState([]);
 
     // Get records
     const fetchPeople = async () => {
@@ -26,6 +27,7 @@ const App = () => {
             }
         });
         setPeople(response.data);
+        setFilteredIds(response.data.map(person => person.id));
     };
 
     useEffect(() => {
@@ -44,15 +46,27 @@ const App = () => {
         setKeyword(event.target.value);
     }
 
+    const fileDownload = async () => {
+        console.log('ids', filteredIds);
+        await api.post('/people/download', filteredIds)
+            .then(response => {
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', 'filtered_people.csv');
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            });
+    };
+
     // Add or update records
     const handleFormSubmit = async (event) => {
         event.preventDefault();
         if (editId) {
-            // Update record
             await api.put(`/people/${editId}`, formData);
             setEditId(null);
         } else {
-            // Create new record
             await api.post('/people/', formData);
         }
         fetchPeople();
@@ -168,7 +182,7 @@ const App = () => {
                 <form onSubmit={fileUpload}>
                     <input type="file" onChange={handleFileChange} />
                     <button type='submit' className='btn btn-primary'>
-                        Carregar
+                        Salvar
                     </button>
                 </form>
             </div>
@@ -257,6 +271,9 @@ const App = () => {
                         ))}
                     </tbody>
                 </table>
+                <button onClick={fileDownload} className='btn btn-success'>
+                    Baixar CSV
+                </button>
             </div>
 
         </div>

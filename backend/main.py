@@ -2,10 +2,12 @@ from datetime import datetime
 from typing import List, Optional
 from fastapi import FastAPI, Depends, HTTPException, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 import models, database, schemas
 import pandas as pd
+import io
 
 app = FastAPI()
 
@@ -45,12 +47,12 @@ async def create_person(person: schemas.PersonBase, db: Session = Depends(get_db
 
 @app.get("/people/", response_model=List[schemas.PersonModel])
 async def fetch_people(
-    db: Session = Depends(get_db),
     skip: int = 0,
     limit: int = 100,
     filter_column: Optional[str] = None,
     filter_value: Optional[str] = None,
-    keyword: Optional[str] = None
+    keyword: Optional[str] = None,
+    db: Session = Depends(get_db)
 ):
     query = db.query(models.Person)
 
@@ -137,6 +139,31 @@ async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db
 
     return {"created_people": f'{len(created_people)} records successfully added to the database.'}
 
-@app.get("/people/download")
-async def download_file(db: Session = Depends(get_db)):
-    pass
+@app.post("/people/download")
+async def download_file(ids: List[int], db: Session = Depends(get_db)):
+    people = db.query(models.Person).filter(models.Person.id.in_(ids)).all()
+
+    if people:
+        df = pd.DataFrame([person.__dict__ for person in people])
+        if '_sa_instance_state' in df.columns:
+            df.drop(columns=['_sa_instance_state'], inplace=True)
+
+        df.drop(columns=['id'], inplace=True)
+
+        df.rename(columns={
+            'name': 'nome',
+            'birthdate': 'data_nascimento',
+            'gender': 'genero',
+            'nationality': 'nacionalidade',
+            'created_at': 'data_criacao',
+            'updated_at': 'data_atualizacao'
+        }, inplace=True)
+
+        column_order = ['nome', 'data_nascimento', 'genero', 'nacionalidade', 'data_criacao', 'data_atualizacao']
+
+        df = df[column_order]
+
+        csv = df.to_csv(index=False)
+
+        return StreamingResponse(io.StringIO(csv), media_type="text/csv", headers={"Content-Disposition": "attachment; filename=filtered_people.csv"})
+    raise HTTPException(status_code=404, detail="No records found")
