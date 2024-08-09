@@ -14,13 +14,15 @@ const App = () => {
     const [editId, setEditId] = useState(null);
     const [filterColumn, setFilterColumn] = useState('');
     const [filterValue, setFilterValue] = useState('');
+    const [keyword, setKeyword] = useState('');
 
     // Get records
     const fetchPeople = async () => {
         const response = await api.get('/people/', {
             params: {
                 filter_column: filterColumn,
-                filter_value: filterValue
+                filter_value: filterValue,
+                keyword: keyword
             }
         });
         setPeople(response.data);
@@ -28,7 +30,7 @@ const App = () => {
 
     useEffect(() => {
         fetchPeople();
-    }, [filterColumn, filterValue]);
+    }, [filterColumn, filterValue, keyword]);
 
     const handleFilterColumnChange = (event) => {
         setFilterColumn(event.target.value);
@@ -37,6 +39,10 @@ const App = () => {
     const handleFilterValueChange = (event) => {
         setFilterValue(event.target.value);
     };
+
+    const handleKeywordChange = (event) => {
+        setKeyword(event.target.value);
+    }
 
     // Add or update records
     const handleFormSubmit = async (event) => {
@@ -185,7 +191,6 @@ const App = () => {
                             <option value='name'>Nome</option>
                             <option value='gender'>Gênero</option>
                             <option value='nationality'>Nacionalidade</option>
-                            <option value='keyword'>Palavra-chave</option>
                         </select>
                     </div>
                     <div className='mb-3'>
@@ -199,6 +204,13 @@ const App = () => {
                             value={filterValue}
                             onChange={handleFilterValueChange}
                         />
+                    </div>
+
+                    <div className='mb-3'>
+                        <label htmlFor='keyword' className='form-label'>
+                            Palavra-chave
+                        </label>
+                        <input type='text' className='form-control' id='keyword' value={keyword} onChange={handleKeywordChange}/>
                     </div>
                 </form>
             </div>
