@@ -32,41 +32,6 @@ def get_db():
         db.close()
 
 
-def serialize_dates(data):
-    if isinstance(data, dict):
-        return {k: serialize_dates(v) for k, v in data.items()}
-    if isinstance(data, list):
-        return [serialize_dates(i) for i in data]
-    if isinstance(data, (datetime, date)):
-        return data.isoformat()
-    return data
-
-
-def log_operation(person_id: int, operation_type: str, old_data=None, new_data=None, db: Session = Depends(get_db)):
-    log_entry = models.Log(
-        person_id=person_id,
-        operation_type=operation_type,
-        old_data=serialize_dates(old_data),
-        new_data=serialize_dates(new_data)
-    )
-    db.add(log_entry)
-    db.commit()
-
-
-def parse_data(person):
-    parsed_data = {
-        "id": person.id,
-        "name": person.name,
-        "birthdate": person.birthdate,
-        "gender": person.gender,
-        "nationality": person.nationality,
-        "created_at": person.created_at,
-        "updated_at": person.updated_at
-    }
-
-    return parsed_data
-
-
 @app.get("/")
 def read_root():
     return {"A simple FastAPI crud using React and PostgreSQL"}
@@ -204,3 +169,44 @@ async def download_file(ids: List[int], db: Session = Depends(get_db)):
 
         return StreamingResponse(io.StringIO(csv), media_type="text/csv", headers={"Content-Disposition": "attachment; filename=filtered_people.csv"})
     raise HTTPException(status_code=404, detail="No records found")
+
+# Logs
+@app.get("/logs/", response_model=List[schemas.LogModel])
+async def fetch_logs(db: Session = Depends(get_db)):
+    logs = db.query(models.Log).all()
+    return logs
+
+
+def serialize_dates(data):
+    if isinstance(data, dict):
+        return {k: serialize_dates(v) for k, v in data.items()}
+    if isinstance(data, list):
+        return [serialize_dates(i) for i in data]
+    if isinstance(data, (datetime, date)):
+        return data.isoformat()
+    return data
+
+
+def log_operation(person_id: int, operation_type: str, old_data=None, new_data=None, db: Session = Depends(get_db)):
+    log_entry = models.Log(
+        person_id=person_id,
+        operation_type=operation_type,
+        old_data=serialize_dates(old_data),
+        new_data=serialize_dates(new_data)
+    )
+    db.add(log_entry)
+    db.commit()
+
+
+def parse_data(person):
+    parsed_data = {
+        "id": person.id,
+        "name": person.name,
+        "birthdate": person.birthdate,
+        "gender": person.gender,
+        "nationality": person.nationality,
+        "created_at": person.created_at,
+        "updated_at": person.updated_at
+    }
+
+    return parsed_data

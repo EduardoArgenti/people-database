@@ -3,6 +3,7 @@ import api from './api';
 
 const App = () => {
     const [people, setPeople] = useState([]);
+    const [logs, setLogs] = useState([]);
     const [formData, setFormData] = useState({
         id: '',
         name: '',
@@ -33,6 +34,11 @@ const App = () => {
     useEffect(() => {
         fetchPeople();
     }, [filterColumn, filterValue, keyword]);
+
+    useEffect(() => {
+        fetchLogs();
+    });
+
 
     const handleFilterColumnChange = (event) => {
         setFilterColumn(event.target.value);
@@ -126,6 +132,12 @@ const App = () => {
             nationality: person.nationality
         });
         setEditId(person.id);
+    };
+
+    // Get logs
+    const fetchLogs = async () => {
+        const response = await api.get('/logs/');
+        setLogs(response.data);
     };
 
     return (
@@ -274,6 +286,34 @@ const App = () => {
                 <button onClick={fileDownload} className='btn btn-success'>
                     Baixar CSV
                 </button>
+            </div>
+
+            <div className='container'>
+                <h3>Logs</h3>
+                <table className='table  table-bordered table-striped table-hover'>
+                    <thead>
+                        <tr>
+                            <th>ID Log</th>
+                            <th>ID pessoa</th>
+                            <th>Tipo de operação</th>
+                            <th>Antes</th>
+                            <th>Depois</th>
+                            <th>Realizado em</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {logs.map((log) => (
+                            <tr key={log.id}>
+                                <td>{log.id}</td>
+                                <td>{log.person_id}</td>
+                                <td>{log.operation_type}</td>
+                                <td>{log.old_data ? JSON.stringify(log.old_data) : 'N/A'}</td>
+                                <td>{log.new_data ? JSON.stringify(log.new_data) : 'N/A'}</td>
+                                <td>{log.timestamp}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
 
         </div>
