@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from typing import List
 from sqlalchemy.orm import Session
-from models.log import Log
 from schemas.log import LogModel
 import core.database as database
+from services.logs import get_logs
 
 router = APIRouter()
 
@@ -18,5 +18,4 @@ def get_db():
 
 @router.get("/logs/", response_model=List[LogModel], tags=['Logs'])
 async def fetch_logs(db: Session = Depends(get_db)):
-    logs = db.query(Log).all()
-    return logs
+    return await get_logs(db)

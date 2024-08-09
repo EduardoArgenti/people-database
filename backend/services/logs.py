@@ -13,6 +13,11 @@ def get_db():
         db.close()
 
 
+async def get_logs(db: Session = Depends(get_db)):
+    logs = db.query(Log).all()
+    return logs
+
+
 def log_operation(person_id: int, operation_type: str, old_data=None, new_data=None, db: Session = Depends(get_db)):
     log_entry = Log(
         person_id=person_id,

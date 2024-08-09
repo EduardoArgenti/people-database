@@ -6,7 +6,6 @@ import core.database as database
 from typing import List, Optional
 from services.people import add_person, get_people, get_person, put_person, delete_person
 from services.logs import log_operation, parse_data
-from datetime import datetime
 
 router = APIRouter()
 
