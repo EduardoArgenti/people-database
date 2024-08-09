@@ -19,7 +19,12 @@ Este projeto consiste em implementar um sistema web fullstack com opção de cri
 ### Backend
 Navegue até o diretório do projeto
 ```
-    cd people-database/backend
+cd people-database/backend
+```
+Crie e ative um ambiente virtual:
+```
+python -m venv venv
+source venv/bin/activate
 ```
 
 ### Frontend
