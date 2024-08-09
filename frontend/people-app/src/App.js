@@ -9,6 +9,7 @@ const App = () => {
         gender: '',
         nationality: ''
     });
+    const [file, setFile] = useState([]);
 
     const fetchPeople = async () => {
         const response = await api.get('/people/');
@@ -30,6 +31,24 @@ const App = () => {
     const handleFormSubmit = async (event) => {
         event.preventDefault();
         await api.post('/people/', formData);
+        fetchPeople();
+        setFormData({
+            name: '',
+            birthdate: '',
+            gender: '',
+            nationality: ''
+        });
+    };
+
+    const handleFileChange = (event) => {
+        setFile(event.target.files[0]);
+    };
+
+    const fileUpload = async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append("file", file, file.name);
+        await api.post(`/people/upload`, formData);
         fetchPeople();
         setFormData({
             name: '',
@@ -90,8 +109,8 @@ const App = () => {
 
             <div className='container'>
                 <h3>Upload de CSV</h3>
-                <form onSubmit={handleFormSubmit}>
-
+                <form onSubmit={fileUpload}>
+                    <input type="file" onChange={handleFileChange} />
                     <button type='submit' className='btn btn-primary'>
                         Carregar
                     </button>
